@@ -6,28 +6,52 @@ import { Input } from "./ui/input";
 import SubmittingButton from "./SubmittingButton";
 import { Button } from "./ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { signInAction } from "@/lib/actions";
+import { credentialsSignIn, signInAction } from "@/lib/actions";
+import { useFormState } from "react-dom";
 
-export type LoginUser = {
-  email: string;
-  password: string;
+// export type LoginUser = {
+//   email: string;
+//   password: string;
+// };
+
+const initialState = {
+  message: "",
 };
 
 export default function LoginForm() {
+  const [state, formAction] = useFormState(credentialsSignIn, initialState);
+  console.log(state, "state");
   return (
     <>
-      <form action={() => {}}>
+      <form action={formAction}>
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input required type="email" id="email" />
+              <Input name="email" required type="email" id="email" />
+              {state.message.email && (
+                <span className="text-red-500">{state?.message?.email[0]}</span>
+              )}
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input required id="password" type="password" />
+              <Input
+                name="password"
+                maxLength={35}
+                required
+                id="password"
+                type="password"
+              />
+              {state.message.password && (
+                <span className="text-red-500">
+                  {state?.message?.password[0]}
+                </span>
+              )}
             </div>
           </div>
+          {state?.message && (
+            <span className="text-red-400">{state.message}</span>
+          )}
         </CardContent>
         <CardFooter>
           <SubmittingButton pendingLabel="Logging In ...">

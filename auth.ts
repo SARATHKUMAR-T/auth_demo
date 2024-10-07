@@ -1,7 +1,12 @@
-import NextAuth from "next-auth"
-import Google from "next-auth/providers/google"
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
 // import { createGuest, getGuest } from "./data-service"
-import Credentials from 'next-auth/providers/credentials'
+import Credentials from 'next-auth/providers/credentials';
+import { NextResponse } from "next/server";
+import dbConnect from "./lib/dbConnection";
+import User from "./models/User";
+
+
 
 
 const authConfig = {
@@ -15,12 +20,12 @@ const authConfig = {
         email: {},
         password: {},
       },
-      authorize: async (credentials) => {
-        console.log("authorize called", credentials);
-
-        const user = {}
-        if (!user) {
-          return { message: 'no user found' }
+      authorize: async (credentials): Promise<any> => {
+        await dbConnect();
+        const user = await User.findOne({ email: credentials.email })
+        console.log(user, "from db");
+        if (!user || user?.length === 0) {
+          throw new Error("No user Found")
         }
         return user
       },
@@ -28,7 +33,6 @@ const authConfig = {
   ],
   callbacks: {
     authorized({ auth, request }: any) {
-      console.log("authorized triggered");
       if (auth?.user?.email && request.nextUrl.pathname == '/login') {
         return NextResponse.redirect(new URL("/account", request.url))
       }
@@ -36,12 +40,19 @@ const authConfig = {
     },
     async signIn({ user, account, profile }: any) {
       try {
+        await dbConnect();
         if (account.provider === "google") {
           console.log(profile);
-        }
+          // const exisistingGuest = await User.find({ email: user.email })
+          // if (!exisistingGuest) await User.create({ email: user.email, fullName: user.name })
 
-        // const exisistingGuest = await getGuest(user.email)
-        // if (!exisistingGuest) await createGuest({ email: user.email, fullName: user.name })
+        }
+        // if (account.provider === "credentials") {
+        //   console.log(profile, "from credentials", user, account);
+        //   // const exisistingGuest = await User.find({ email: user.email })
+        //   // console.log(exisistingGuest, "guest");
+        // }
+
         return true
       } catch (error) {
         console.log(error, "from signin");

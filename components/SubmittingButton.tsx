@@ -13,7 +13,7 @@ export default function SubmittingButton({
   const { pending } = useFormStatus();
 
   return (
-    <Button className="w-full" disabled={pending}>
+    <Button type="submit" className="w-full" disabled={pending}>
       {pending ? pendingLabel : children}
     </Button>
   );
