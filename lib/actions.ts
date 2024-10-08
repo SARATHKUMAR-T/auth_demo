@@ -32,6 +32,8 @@ export async function credentialsSignIn(prevState: any, formData: FormData): Pro
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    console.log(error, "error from auth");
+
     return { message: "Invalid Credentails Either email or password is wrong" }
   }
 }

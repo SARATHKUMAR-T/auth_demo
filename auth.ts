@@ -4,7 +4,7 @@ import Google from "next-auth/providers/google";
 import Credentials from 'next-auth/providers/credentials';
 import { NextResponse } from "next/server";
 import dbConnect from "./lib/dbConnection";
-import User from "./models/User";
+import User, { Users } from "./models/User";
 
 
 
@@ -24,10 +24,12 @@ const authConfig = {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email })
         console.log(user, "from db");
-        if (!user || user?.length === 0) {
+        if (user) {
+          console.log("user triggered");
+          return { ...user, _id: String(user._id) }
+        } else {
           throw new Error("No user Found")
         }
-        return user
       },
     })
   ],
@@ -42,27 +44,27 @@ const authConfig = {
       try {
         await dbConnect();
         if (account.provider === "google") {
-          console.log(profile);
-          // const exisistingGuest = await User.find({ email: user.email })
-          // if (!exisistingGuest) await User.create({ email: user.email, fullName: user.name })
-
+          console.log(user, "user");
+          const userName = user?.name.split(" ")
+          const exisistingGuest = await User.findOne({ email: user.email })
+          if (!exisistingGuest) await User.create({ email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.profileImg, password: '', authProvider: "google" })
+          return true
         }
-        // if (account.provider === "credentials") {
-        //   console.log(profile, "from credentials", user, account);
-        //   // const exisistingGuest = await User.find({ email: user.email })
-        //   // console.log(exisistingGuest, "guest");
-        // }
-
+        if (account.provider === "credentials") {
+          return true
+        }
         return true
       } catch (error) {
         console.log(error, "from signin");
-
         return false
       }
     },
     async session({ session, user }: any) {
-      // const guest = await getGuest(session.user.email)
-      // session.user.guestId = guest.id
+      await dbConnect();
+      const guest = await User.findOne({ email: session.user.email })
+      session.user.user_id = guest._id
+      console.log(session, "session");
+
       return session
     }
   },

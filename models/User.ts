@@ -5,8 +5,9 @@ export interface Users extends mongoose.Document {
   firstName: string,
   lastName: string,
   email: string,
-  password: string,
   authProvider: string
+  profileImg: string,
+  password?: string,
 }
 
 const UserSchema = new mongoose.Schema<Users>({
@@ -26,13 +27,16 @@ const UserSchema = new mongoose.Schema<Users>({
   },
   password: {
     type: String,
-    required: [true, "Password Is Required"],
     default: ''
   },
   authProvider: {
     type: String,
     enum: ["credentials", "google"],
     default: "credentials"
+  },
+  profileImg: {
+    type: String,
+    default: ''
   }
 
 })
