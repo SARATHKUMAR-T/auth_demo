@@ -29,7 +29,7 @@ export default function LoginForm() {
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input name="email" required type="email" id="email" />
-              {state.message.email && (
+              {state?.message?.email && (
                 <span className="text-red-500">{state?.message?.email[0]}</span>
               )}
             </div>
@@ -42,7 +42,7 @@ export default function LoginForm() {
                 id="password"
                 type="password"
               />
-              {state.message.password && (
+              {state?.message?.password && (
                 <span className="text-red-500">
                   {state?.message?.password[0]}
                 </span>

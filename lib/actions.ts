@@ -1,6 +1,7 @@
 'use server'
 
 import { signIn, signOut } from "@/auth";
+import { redirect } from "next/navigation";
 import { z } from 'zod'
 
 const userValidationSchema = z.object({
@@ -27,14 +28,20 @@ export async function credentialsSignIn(prevState: any, formData: FormData): Pro
       }
     }
 
-    await signIn("credentials", validatedFileds.data)
-
+    const res = await signIn("credentials", {
+      email: validatedFileds.data.email,
+      password: validatedFileds.data.password,
+      redirect: false
+    })
+    if (res) {
+      redirect('/account')
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log(error, "error from auth");
-
-    return { message: "Invalid Credentails Either email or password is wrong" }
+    console.log(error.message, "auth error");
+    return { message: error.message.split('.')[0] }
   }
 }
 

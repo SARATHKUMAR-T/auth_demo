@@ -1,10 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 import Google from "next-auth/providers/google";
-// import { createGuest, getGuest } from "./data-service"
 import Credentials from 'next-auth/providers/credentials';
 import { NextResponse } from "next/server";
 import dbConnect from "./lib/dbConnection";
-import User, { Users } from "./models/User";
+import User from "./models/User";
 
 
 
@@ -23,13 +22,10 @@ const authConfig = {
       authorize: async (credentials): Promise<any> => {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email })
-        console.log(user, "from db");
-        if (user) {
-          console.log("user triggered");
-          return { ...user, _id: String(user._id) }
-        } else {
-          throw new Error("No user Found")
+        if (!user) {
+          throw new AuthError("No User Found")
         }
+        return user
       },
     })
   ],
@@ -42,15 +38,11 @@ const authConfig = {
     },
     async signIn({ user, account, profile }: any) {
       try {
-        await dbConnect();
         if (account.provider === "google") {
-          console.log(user, "user");
+          await dbConnect();
           const userName = user?.name.split(" ")
           const exisistingGuest = await User.findOne({ email: user.email })
-          if (!exisistingGuest) await User.create({ email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.profileImg, password: '', authProvider: "google" })
-          return true
-        }
-        if (account.provider === "credentials") {
+          if (!exisistingGuest) await new User({ email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.image, password: '', authProvider: "google" }).save()
           return true
         }
         return true
@@ -59,11 +51,12 @@ const authConfig = {
         return false
       }
     },
+
     async session({ session, user }: any) {
-      await dbConnect();
-      const guest = await User.findOne({ email: session.user.email })
-      session.user.user_id = guest._id
-      console.log(session, "session");
+      // await dbConnect();
+      // const guest = await User.find({ email: session.user.email })
+      // session.user.user_id = guest[0]._id
+      // console.log(session, "session");
 
       return session
     }
