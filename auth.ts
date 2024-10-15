@@ -4,6 +4,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { NextResponse } from "next/server";
 import dbConnect from "./lib/dbConnection";
 import User from "./models/User";
+import { NO_USER_FOUND } from "./lib/constants";
 
 
 
@@ -22,10 +23,13 @@ const authConfig = {
       authorize: async (credentials): Promise<any> => {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email })
-        if (!user) {
-          throw new AuthError("No User Found")
+        console.log(user, "user");
+        if (user) {
+          return { email: user.email, name: user.firstName + user.lastName, _id: String(user._id) }
         }
-        return user
+        else {
+          throw new AuthError(NO_USER_FOUND)
+        }
       },
     })
   ],
