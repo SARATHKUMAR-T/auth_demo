@@ -1,5 +1,8 @@
 import mongoose, { models } from "mongoose";
 
+export const config = {
+  runtime: 'nodejs',
+};
 
 export interface Users extends mongoose.Document {
   firstName: string,
@@ -41,6 +44,8 @@ const userSchema = new mongoose.Schema<Users>({
 
 })
 
-const User = models?.User || mongoose.model<Users>("User", userSchema)
+const User = models?.User || mongoose.model<Users>("User", userSchema);
 
-export default User
+export default User;
+
+
