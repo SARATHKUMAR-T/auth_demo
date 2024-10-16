@@ -1,26 +1,18 @@
 "use client";
-import React from "react";
-import { CardContent, CardDescription, CardFooter } from "./ui/card";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import SubmittingButton from "./SubmittingButton";
-import { Button } from "./ui/button";
-import { FcGoogle } from "react-icons/fc";
-import {
-  createUserAccount,
-  credentialsSignIn,
-  signInAction,
-} from "@/lib/actions";
-import { useFormState } from "react-dom";
+import { createUserAccount } from "@/lib/actions";
 import {
   ACCOUNT_CREATION_SUCCEESSFUL,
   EXISISTING_USER_MESSAGE,
-  NO_USER_FOUND,
   REDIRECT_TO_SIGNIN,
-  REDIRECT_TO_SIGNUP,
 } from "@/lib/constants";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useFormState } from "react-dom";
+import { toast } from "sonner";
+import SubmittingButton from "./SubmittingButton";
+import { Badge } from "./ui/badge";
+import { CardContent, CardFooter } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 // export type LoginUser = {
 //   email: string;
@@ -55,25 +47,25 @@ export default function SignUpForm() {
               <Label htmlFor="firstName">First Name</Label>
               <Input name="firstName" required type="text" id="firstName" />
               {state?.message?.firstName && (
-                <span className="text-red-500">
+                <Badge variant="destructive">
                   {state?.message?.firstName[0]}
-                </span>
+                </Badge>
               )}
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="email">Last Name</Label>
               <Input name="lastName" required type="text" id="lastName" />
               {state?.message?.lastName && (
-                <span className="text-red-500">
+                <Badge variant="destructive">
                   {state?.message?.lastName[0]}
-                </span>
+                </Badge>
               )}
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input name="email" required type="email" id="email" />
               {state?.message?.email && (
-                <span className="text-red-500">{state?.message?.email[0]}</span>
+                <Badge variant="destructive">{state?.message?.email[0]}</Badge>
               )}
             </div>
             <div className="flex flex-col space-y-1.5">
@@ -86,15 +78,13 @@ export default function SignUpForm() {
                 type="password"
               />
               {state?.message?.password && (
-                <span className="text-red-500">
+                <Badge variant="destructive">
                   {state?.message?.password[0]}
-                </span>
+                </Badge>
               )}
             </div>
           </div>
-          <p className="text-red-500">
-            {state?.message?.error ? `${state.message.error}` : ""}
-          </p>
+          {state?.message?.error && <Badge>${state.message.error}</Badge>}
         </CardContent>
         <CardFooter>
           <SubmittingButton pendingLabel="Creating ...">
