@@ -85,6 +85,9 @@ export default function SignUpForm() {
             </div>
           </div>
           {state?.message?.error && <Badge>${state.message.error}</Badge>}
+          {state?.message?.info && (
+            <Badge variant="outline">${state.message.info}</Badge>
+          )}
         </CardContent>
         <CardFooter>
           <SubmittingButton pendingLabel="Creating ...">

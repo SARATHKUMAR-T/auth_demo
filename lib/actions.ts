@@ -1,12 +1,11 @@
 'use server'
 
 import { signIn, signOut } from "@/auth";
+import bcrypt from 'bcrypt';
 import { redirect } from "next/navigation";
-import { z } from 'zod'
-import dbConnect from "./dbConnection";
-import User from "@/models/User";
-import bcrypt from 'bcrypt'
+import { z } from 'zod';
 import { ACCOUNT_CREATION_SUCCEESSFUL, EXISISTING_USER_MESSAGE } from "./constants";
+import { fetchCall } from "./utils";
 
 const userValidationSchema = z.object({
   email: z.string().email("Invalid Email"),
@@ -80,17 +79,26 @@ export async function createUserAccount(prevState: any, formData: FormData): Pro
       }
     }
     const userData = validatedFileds.data
-    await dbConnect()
-    const user = await User.findOne({ email: userData.email })
-    if (user) {
+    const user = await fetchCall('/user/userDetails', 'POST', { email: userData.email })
+    if (!user.isError) {
       throw new Error(EXISISTING_USER_MESSAGE)
     }
     else {
       const hashedPassword = bcrypt.hashSync(userData.password, 10)
-      await User.create({ ...userData, password: hashedPassword })
-      return { message: { info: ACCOUNT_CREATION_SUCCEESSFUL } }
+      const res = await fetchCall('/user/newUser', 'POST', { ...userData, password: hashedPassword })
+      if (!res.isError) {
+        return { message: { info: ACCOUNT_CREATION_SUCCEESSFUL } }
+      } else {
+        return { message: { info: "Unable To Create Account" } }
+      }
     }
   } catch (error: any) {
     return { message: { error: error.message } }
   }
 }
+
+
+
+
+
+

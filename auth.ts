@@ -1,10 +1,8 @@
 import NextAuth, { AuthError } from "next-auth";
-import Google from "next-auth/providers/google";
 import Credentials from 'next-auth/providers/credentials';
+import Google from "next-auth/providers/google";
 import { NextResponse } from "next/server";
-import dbConnect from "./lib/dbConnection";
-import User from "./models/User";
-import { NO_USER_FOUND } from "./lib/constants";
+import { fetchCall } from "./lib/utils";
 
 
 
@@ -21,14 +19,12 @@ const authConfig = {
         password: {},
       },
       authorize: async (credentials): Promise<any> => {
-        await dbConnect();
-        const user = await User.findOne({ email: credentials.email })
-        console.log(user, "user");
-        if (user) {
-          return { email: user.email, name: user.firstName + user.lastName, _id: String(user._id) }
+        const user = await fetchCall('/user/userDetails', 'POST', credentials)
+        if (!user.isError) {
+          return { ...user }
         }
         else {
-          throw new AuthError(NO_USER_FOUND)
+          throw new AuthError(user.message)
         }
       },
     })
@@ -43,10 +39,9 @@ const authConfig = {
     async signIn({ user, account, profile }: any) {
       try {
         if (account.provider === "google") {
-          await dbConnect();
           const userName = user?.name.split(" ")
-          const exisistingGuest = await User.findOne({ email: user.email })
-          if (!exisistingGuest) await new User({ email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.image, password: '', authProvider: "google" }).save()
+          const exisistingGuest = await fetchCall('/user/userDetails', 'POST', { email: user.email })
+          if (exisistingGuest.isError) await fetchCall('/user/newUser', 'POST', { email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.image, password: '', authProvider: "google" })
           return true
         }
         return true
