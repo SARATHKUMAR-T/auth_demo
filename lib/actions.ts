@@ -42,8 +42,10 @@ export async function credentialsSignIn(prevState: any, formData: FormData): Pro
     const res = await signIn("credentials", {
       email: validatedFileds.data.email,
       password: validatedFileds.data.password,
-      redirectTo: "/account"
+      redirect: false
     })
+    console.log(res, "res");
+
     if (res) {
       redirect('/account')
     }

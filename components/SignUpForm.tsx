@@ -1,4 +1,5 @@
 "use client";
+import { useActionState } from "react";
 import { createUserAccount } from "@/lib/actions";
 import {
   ACCOUNT_CREATION_SUCCEESSFUL,
@@ -6,7 +7,6 @@ import {
   REDIRECT_TO_SIGNIN,
 } from "@/lib/constants";
 import { useRouter } from "next/navigation";
-import { useFormState } from "react-dom";
 import { toast } from "sonner";
 import SubmittingButton from "./SubmittingButton";
 import { Badge } from "./ui/badge";
@@ -25,7 +25,7 @@ const initialState = {
 
 export default function SignUpForm() {
   const router = useRouter();
-  const [state, formAction] = useFormState(createUserAccount, initialState);
+  const [state, formAction] = useActionState(createUserAccount, initialState);
   if (state.message.error === EXISISTING_USER_MESSAGE) {
     setTimeout(() => toast.warning(REDIRECT_TO_SIGNIN), 800);
     setTimeout(() => {

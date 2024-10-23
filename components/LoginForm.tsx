@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useActionState } from "react";
 import { CardContent, CardDescription, CardFooter } from "./ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -7,7 +7,6 @@ import SubmittingButton from "./SubmittingButton";
 import { Button } from "./ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { credentialsSignIn, signInAction } from "@/lib/actions";
-import { useFormState } from "react-dom";
 import { NO_USER_FOUND, REDIRECT_TO_SIGNUP } from "@/lib/constants";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -24,7 +23,7 @@ const initialState = {
 
 export default function LoginForm() {
   const router = useRouter();
-  const [state, formAction] = useFormState(credentialsSignIn, initialState);
+  const [state, formAction] = useActionState(credentialsSignIn, initialState);
   if (state.message.error === NO_USER_FOUND) {
     setTimeout(() => toast.warning(REDIRECT_TO_SIGNUP), 800);
     setTimeout(() => {
