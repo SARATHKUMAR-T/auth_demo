@@ -1,4 +1,4 @@
-export const NO_USER_FOUND = "No User Found"
+export const NO_USER_FOUND = "No user Found"
 export const REDIRECT_TO_SIGNUP = "Redireting To SignUp"
 export const ACCOUNT_CREATION_SUCCEESSFUL = "Account Creation Successful"
 export const EXISISTING_USER_MESSAGE = "User Already Exists!!!"

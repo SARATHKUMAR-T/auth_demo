@@ -19,7 +19,7 @@ const authConfig = {
         password: {},
       },
       authorize: async (credentials): Promise<any> => {
-        const user = await fetchCall('/user/userDetails', 'POST', credentials)
+        const user = await fetchCall('/login', 'POST', credentials)
         if (!user.isError) {
           return { ...user }
         }
@@ -40,8 +40,9 @@ const authConfig = {
       try {
         if (account.provider === "google") {
           const userName = user?.name.split(" ")
-          const exisistingGuest = await fetchCall('/user/userDetails', 'POST', { email: user.email })
-          if (exisistingGuest.isError) await fetchCall('/user/newUser', 'POST', { email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.image, password: '', authProvider: "google" })
+          const exisistingGuest = await fetchCall('/checkUser', 'POST', { email: user.email })
+          console.log(exisistingGuest, "ex guest");
+          if (exisistingGuest.isError) await fetchCall('/addUser', 'POST', { email: user.email, firstName: userName[0], lastName: userName[1], profileImg: user.image, password: '', authProvider: "google" })
           return true
         }
         return true

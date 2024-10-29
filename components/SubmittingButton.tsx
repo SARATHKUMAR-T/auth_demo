@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { useFormStatus } from "react-dom";
+import { Loader2 } from "lucide-react";
 
 export default function SubmittingButton({
   children,
@@ -14,7 +15,14 @@ export default function SubmittingButton({
 
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? pendingLabel : children}
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+          <span>{pendingLabel}</span>
+        </>
+      ) : (
+        <span>{children}</span>
+      )}
     </Button>
   );
 }
